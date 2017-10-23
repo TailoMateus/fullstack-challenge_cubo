@@ -6,7 +6,11 @@ class App extends Component {
 
   constructor() {
     super();
-    this.state = {lista: [{nome: 'teste', sobrenome: 'testes', participacao: '50'}]};
+    this.state = {lista: [], nome:'', sobrenome:'', participacao:''};
+    this.enviaForm = this.enviaForm.bind(this);
+    this.setNome = this.setNome.bind(this);
+    this.setSobrenome = this.setSobrenome.bind(this);
+    this.setParticipacao = this.setParticipacao.bind(this);
   }
 
   componentWillMount() {
@@ -19,6 +23,36 @@ class App extends Component {
     })
   }
 
+  enviaForm(evento) {
+    evento.preventDefault();
+
+    $.ajax({
+      url: 'http://localhost:3000',
+      contentType: 'application/json',
+      dataType: 'json',
+      type: 'post',
+      data: JSON.stringify({nome:this.state.nome, sobrenome:this.state.sobrenome, participacao:this.state.participacao}),
+      success: function(resposta){
+        this.setState({lista: resposta});
+      }.bind(this),
+      error: function(resposta){
+        console.log("erro");
+      }
+    });
+  }
+
+  setNome(evento) {
+    this.setState({nome:evento.target.value});
+  }
+
+  setSobrenome(evento) {
+     this.setState({sobrenome:evento.target.value});
+  }
+
+  setParticipacao(evento) {
+     this.setState({participacao:evento.target.value});
+  }
+
   render() {
     return (
       <div className="App">
@@ -29,17 +63,17 @@ class App extends Component {
             Nunc tincidunt ante vitae massa.
           </p>
 
-          <form action="/pagina-processa-dados-do-form" method="post">
+          <form onSubmit={this.enviaForm} method="post">
             <div>
-                <input type="text" id="nome" placeholder="Nome" />
+                <input type="text" id="nome" value={this.state.nome} placeholder="Nome" onChange={this.setNome} />
             </div>
 
             <div>
-                <input type="text" id="sobrenome" placeholder="Sobrenome" />
+                <input type="text" id="sobrenome" value={this.state.sobrenome} placeholder="Sobrenome" onChange={this.setSobrenome} />
             </div>
 
             <div>
-                <input type="text" id="participacao" placeholder="Participação" />
+                <input type="text" id="participacao" value={this.state.participacao} placeholder="Participação" onChange={this.setParticipacao} />
             </div>
             <div className="button">
                 <button type="submit">ENVIAR</button>
@@ -64,10 +98,10 @@ class App extends Component {
             { 
               this.state.lista.map(function(pessoa){
                 return (
-                  <tr>
-                    <td>{ pessoa.nome }</td>
-                    <td>{ pessoa.sobrenome }</td>
-                    <td>{ pessoa.participacao }</td>
+                  <tr key={pessoa.id}>
+                    <td>{pessoa.nome}</td>
+                    <td>{pessoa.sobrenome}</td>
+                    <td>{pessoa.participacao}</td>
                   </tr>
                 )
               }) 
