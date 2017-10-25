@@ -1,17 +1,15 @@
 import React, { Component } from 'react';
 import './App.css';
 import $ from 'jquery';
-import {FormularioPessoa, TabelaPessoas} from './Pessoa';
+import PessoaBox from './Pessoa';
 
 class App extends Component {
 
   render() {
     return (
       <div className="App">
-        
-        <FormularioPessoa/>
 
-        <TabelaPessoas/>
+        <PessoaBox/>
       </div>
     );
   }

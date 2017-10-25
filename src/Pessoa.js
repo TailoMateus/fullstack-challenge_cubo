@@ -2,8 +2,10 @@ import React, { Component } from 'react';
 import $ from 'jquery';
 import InputCustomized from './components/InputCustomized';
 import ButtonCustomized from './components/ButtonCustomized';
+import PubSub from 'pubsub-js';
+import TratadorErros from './TratadorErros';
 
-export class FormularioPessoa extends Component {
+class FormularioPessoa extends Component {
 
 	constructor() {
     super();
@@ -23,11 +25,17 @@ export class FormularioPessoa extends Component {
       dataType: 'json',
       type: 'post',
       data: JSON.stringify({nome:this.state.nome, sobrenome:this.state.sobrenome, participacao:this.state.participacao}),
-      success: function(resposta){
-        this.setState({lista: resposta});
+      success: function(novaListagem){
+      	PubSub.publish('atualiza-lista-pessoas', novaListagem);
+      	this.setState({nome:'',email:'',senha:''});
       }.bind(this),
       error: function(resposta){
-        console.log("erro");
+        if(resposta.status === 400) {
+        	new TratadorErros().publicaErros(resposta.responseJSON);
+        }
+      },
+      beforeSend: function() {
+      	PubSub.publish("limpa-erros", {});
       }
     });
   }
@@ -66,22 +74,7 @@ export class FormularioPessoa extends Component {
 	}
 }
 
-export class TabelaPessoas extends Component {
-
-	constructor() {
-    super();
-    this.state = {lista: []};
-  }
-
-  componentWillMount() {
-    $.ajax({
-      url: "http://localhost:3000",
-      dataType: 'json',
-      success:function(resposta) {
-        this.setState({lista:resposta});
-      }.bind(this)
-    })
-  }
+class TabelaPessoas extends Component {
 
 	render() {
 		return(
@@ -99,7 +92,7 @@ export class TabelaPessoas extends Component {
 	          <th>Participação</th>
 	        </tr>
 	        { 
-	          this.state.lista.map(function(pessoa){
+	          this.props.lista.map(function(pessoa){
 	            return (
 	              <tr key={pessoa.id}>
 	                <td>{pessoa.nome}</td>
@@ -115,5 +108,36 @@ export class TabelaPessoas extends Component {
         </div>
       </div>
 		)
+	}
+}
+
+export default class PessoaBox extends Component {
+
+	constructor() {
+	    super();
+	    this.state = {lista: []};
+  	}
+
+  componentWillMount() {
+    $.ajax({
+      url: "http://localhost:3000",
+      dataType: 'json',
+      success:function(resposta) {
+        this.setState({lista:resposta});
+      }.bind(this)
+    })
+
+    PubSub.subscribe('atualiza-lista-pessoas', function(topico, novaListagem){
+    	this.setState({lista:novaLista});
+    }.bind());
+  }
+
+	render() {
+		return(
+			<div>
+				<FormularioPessoa/>
+        <TabelaPessoas lista={this.state.lista}/>
+      </div>
+		);
 	}
 }
