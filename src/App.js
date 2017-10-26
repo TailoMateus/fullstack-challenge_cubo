@@ -1,15 +1,14 @@
 import React, { Component } from 'react';
 import './App.css';
 import $ from 'jquery';
-import PessoaBox from './Pessoa';
+import {Link} from 'react-router';
 
 class App extends Component {
 
   render() {
     return (
       <div className="App">
-
-        <PessoaBox/>
+      	{this.props.children}
       </div>
     );
   }
