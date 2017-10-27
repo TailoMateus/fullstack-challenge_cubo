@@ -9,7 +9,7 @@ class FormularioPessoa extends Component {
 
 	constructor() {
     super();
-    this.state = {lista: [], nome:'', sobrenome:'', participacao:''};
+    this.state = {nome:'', sobrenome:'', participacao:''};
     this.enviaForm = this.enviaForm.bind(this);
     this.setNome = this.setNome.bind(this);
     this.setSobrenome = this.setSobrenome.bind(this);
@@ -67,7 +67,7 @@ class FormularioPessoa extends Component {
 
 	        <InputCustomized id="participacao" type="text" name="participacao" value={this.state.participacao} onChange={this.setParticipacao}/>
 
-	        <ButtonCustomized type="submit">Enviar</button>
+	        <ButtonCustomized type="submit" value="Enviar"/>
 	      </form>
 	    </div>
 		)
@@ -114,9 +114,9 @@ class TabelaPessoas extends Component {
 export default class PessoaBox extends Component {
 
 	constructor() {
-	    super();
-	    this.state = {lista: []};
-  	}
+    super();
+    this.state = {lista: []};
+	}
 
   componentWillMount() {
     $.ajax({
@@ -127,7 +127,7 @@ export default class PessoaBox extends Component {
       }.bind(this)
     })
 
-    PubSub.subscribe('atualiza-lista-pessoas', function(topico, novaListagem){
+    PubSub.subscribe('atualiza-lista-pessoas', function(topico, novaLista){
     	this.setState({lista:novaLista});
     }.bind());
   }

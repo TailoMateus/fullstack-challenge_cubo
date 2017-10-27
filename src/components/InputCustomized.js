@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PubSub from 'pubsub-js';
 
-export default class InputCustomized extend Component {
+export default class InputCustomized extends Component {
 
 	constructor() {
 		super();
@@ -11,7 +11,8 @@ export default class InputCustomized extend Component {
 	render() {
 		return(
 			<div>
-    			<input type={this.props.type} id={this.props.id} value={this.props.value} placeholder="Nome" onChange={this.props.onChange} />
+    			<input {...this.props} />
+				
 				<span className="error">{this.state.msgErro}</span>
 			</div>
 		);
