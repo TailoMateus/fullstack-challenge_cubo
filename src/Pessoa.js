@@ -11,9 +11,6 @@ class FormularioPessoa extends Component {
     super();
     this.state = {nome:'', sobrenome:'', participacao:''};
     this.enviaForm = this.enviaForm.bind(this);
-    this.setNome = this.setNome.bind(this);
-    this.setSobrenome = this.setSobrenome.bind(this);
-    this.setParticipacao = this.setParticipacao.bind(this);
 	}
 
 	enviaForm(evento) {
@@ -40,16 +37,12 @@ class FormularioPessoa extends Component {
     });
   }
 
-	setNome(evento) {
-		this.setState({nome:evento.target.value});
-	}
+	saveUpdate(nomeInput, evento) {
+		var fieldUpdate = {};
 
-	setSobrenome(evento) {
-		this.setState({sobrenome:evento.target.value});
-	}
+		fieldUpdate[nomeInput] = evento.target.value;
 
-	setParticipacao(evento) {
-	 	this.setState({participacao:evento.target.value});
+		this.setState(fieldUpdate);
 	}
 
 	render() {
@@ -61,11 +54,11 @@ class FormularioPessoa extends Component {
           Nunc tincidunt ante vitae massa.
         </p>
 			  <form onSubmit={this.enviaForm} method="post">
-	        <InputCustomized id="nome" type="text" name="nome" value={this.state.nome} onChange={this.setNome}/>
+	        <InputCustomized id="nome" type="text" name="nome" value={this.state.nome} onChange={this.saveUpdate.bind(this, 'nome')}/>
 
-	        <InputCustomized id="sobrenome" type="text" name="sobrenome" value={this.state.sobrenome} onChange={this.setSobrenome}/>
+	        <InputCustomized id="sobrenome" type="text" name="sobrenome" value={this.state.sobrenome} onChange={this.saveUpdate.bind(this, 'sobrenome')}/>
 
-	        <InputCustomized id="participacao" type="text" name="participacao" value={this.state.participacao} onChange={this.setParticipacao}/>
+	        <InputCustomized id="participacao" type="text" name="participacao" value={this.state.participacao} onChange={this.saveUpdate.bind(this, 'participacao')}/>
 
 	        <ButtonCustomized type="submit" value="Enviar"/>
 	      </form>
