@@ -7,8 +7,8 @@ import TratadorErros from './TratadorErros';
 
 class FormularioPessoa extends Component {
 
-	constructor() {
-    super();
+	constructor(props) {
+    super(props);
     this.state = {nome:'', sobrenome:'', participacao:''};
     this.enviaForm = this.enviaForm.bind(this);
 	}
@@ -17,14 +17,14 @@ class FormularioPessoa extends Component {
     evento.preventDefault();
 
     $.ajax({
-      url: 'http://localhost:3000',
+      url: 'http://localhost:8080/index/dados',
       contentType: 'application/json',
       dataType: 'json',
       type: 'post',
       data: JSON.stringify({nome:this.state.nome, sobrenome:this.state.sobrenome, participacao:this.state.participacao}),
       success: function(novaListagem){
       	PubSub.publish('atualiza-lista-pessoas', novaListagem);
-      	this.setState({nome:'',email:'',senha:''});
+      	this.setState({nome:'',sobrenome:'',participacao:''});
       }.bind(this),
       error: function(resposta){
         if(resposta.status === 400) {
@@ -70,67 +70,79 @@ class FormularioPessoa extends Component {
 class TabelaPessoas extends Component {
 
 	render() {
-		return(
-			<div className="dados">
-        <h1> DADOS </h1>
-        <p>
-          Morbi a metus. Phasellus enim erat, vestibulum vel, aliquam a, posuere eu, velit. 
-          Nunc tincidunt ante vitae massa.
-        </p>
-			  <table>
-	        <tr>
-	          <th></th>
-	          <th>Nome</th>
-	          <th>Sobrenome</th>
-	          <th>Participação</th>
-	        </tr>
-	        { 
-	          this.props.lista.map(function(pessoa){
-	            return (
-	              <tr key={pessoa.id}>
-	                <td>{pessoa.nome}</td>
-	                <td>{pessoa.sobrenome}</td>
-	                <td>{pessoa.participacao}</td>
-	              </tr>
-	            )
-	          }) 
-	        }
-	      </table>
-	    	<div className="grafico">
 
-        </div>
-      </div>
-		)
+	    var pessoas = this.props.lista.map(function(pessoa){
+	      return(
+	          <tr key={pessoa.nome}>
+                <td>{pessoa.nome}</td>
+                <td>{pessoa.sobrenome}</td>
+                <td>{pessoa.participacao}</td>
+              </tr>
+	        );
+	      });
+
+
+	    return(
+	    	<div className="dados">
+		        <h1> DADOS </h1>
+		        <p>
+		          Morbi a metus. Phasellus enim erat, vestibulum vel, aliquam a, posuere eu, velit. 
+		          Nunc tincidunt ante vitae massa.
+		        </p>
+
+		      <table className="pure-table">
+		        <thead>
+		          <tr>
+		            <th>Nome</th>
+		            <th>Sobrenome</th>
+		            <th>Participacao</th>
+		          </tr>
+		        </thead>
+		        <tbody>
+		          {pessoas}
+		        </tbody>
+		      </table>
+
+		      <div className="grafico">
+
+
+		        </div>
+		    </div>
+	    );
 	}
 }
 
 export default class PessoaBox extends Component {
 
-	constructor() {
-    super();
-    this.state = {lista: []};
+	constructor(props) {
+	    super(props);
+	    this.state = {lista: []};
 	}
 
-  componentWillMount() {
+  componentDidMount() {
     $.ajax({
-      url: "http://localhost:3000",
+      url: "http://localhost:8080/index/dados",
       dataType: 'json',
       success:function(resposta) {
+
         this.setState({lista:resposta});
       }.bind(this)
-    })
+    });
 
-    PubSub.subscribe('atualiza-lista-pessoas', function(topico, novaLista){
-    	this.setState({lista:novaLista});
-    }.bind());
+
+    PubSub.subscribe('atualiza-lista-pessoas', function(topico,lista){
+
+      this.setState({lista:lista});
+
+    }.bind(this));    
   }
 
 	render() {
 		return(
 			<div>
 				<FormularioPessoa/>
-        <TabelaPessoas lista={this.state.lista}/>
-      </div>
+        		<TabelaPessoas lista={this.state.lista}/>
+      		</div>
 		);
 	}
 }
